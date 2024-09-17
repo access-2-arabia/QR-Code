@@ -60,6 +60,7 @@ afterEvaluate {
             artifactId = "qr-Code"
             version = "1.0.0"
 
+
         }
     }
 }
