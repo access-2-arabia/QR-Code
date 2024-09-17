@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
+    id("maven-publish")
 }
 
 android {
@@ -48,4 +49,17 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation ("com.github.yuriy-budiyev:code-scanner:2.3.2")
+}
+
+
+afterEvaluate {
+    android.libraryVariants.forEach { variant ->
+        publishing.publications.create<MavenPublication>(variant.name){
+            groupId = "com.a2a"
+            artifactId = "qrCode"
+            version = "1.0.0"
+            pom.packaging = "jar"
+
+        }
+    }
 }
