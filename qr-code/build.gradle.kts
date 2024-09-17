@@ -55,10 +55,10 @@ dependencies {
 afterEvaluate {
     android.libraryVariants.forEach { variant ->
         publishing.publications.create<MavenPublication>(variant.name){
+            from(components.findByName(variant.name))
             groupId = "com.a2a"
-            artifactId = "qrCode"
+            artifactId = "qr-Code"
             version = "1.0.0"
-            pom.packaging = "jar"
 
         }
     }
