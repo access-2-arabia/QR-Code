@@ -23,7 +23,7 @@
             android:layout_margin="16dp"
             android:importantForAccessibility="no"
             app:srcCompat="@drawable/ic_gallery"
-            app:tint="@color/white" />
+            app:tint="@android:color/white" />
 
     </FrameLayout>
 </layout>

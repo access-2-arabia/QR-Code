@@ -15,7 +15,10 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
-        maven { url = uri("https://jitpack.io") }
+        maven {
+            url = uri("https://jitpack.io")
+            credentials { username = "jp_p1hah77u2v08mli199fs77olfu" }
+        }
         mavenCentral()
     }
 }
