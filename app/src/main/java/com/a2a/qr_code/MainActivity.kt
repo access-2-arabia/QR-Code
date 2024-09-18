@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
             scanQrLauncher.launch(
                ScanQrOption.Builder()
                     .serReadFromGallery(true)
-                    .setAutoFocusEnabled(false)
+                    .setAutoFocusEnabled(true)
                     .build()
             )
         }
