@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.a2a.qrCode.databinding.ActivityScanQrBinding
 import com.a2a.qr_code.extensions.decodeQRCodeFromUri
 import com.budiyev.android.codescanner.AutoFocusMode
@@ -71,7 +72,15 @@ class ScanQRActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityScanQrBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.imgSelectImage.setOnClickListener { checkReadExternalPermission() }
+        setupOptions()
+        binding.imgGallery.setOnClickListener { checkReadExternalPermission() }
+    }
+
+    private fun setupOptions() {
+        val fromGallery = intent.getBooleanExtra(FROM_GALLERY, false)
+        val autoFocusEnabled = intent.getBooleanExtra(AUTO_FOCUS, true)
+        binding.imgGallery.isVisible = fromGallery
+        binding.scannerView.isAutoFocusButtonVisible= autoFocusEnabled
     }
 
     override fun onStart() {
@@ -136,6 +145,8 @@ class ScanQRActivity : AppCompatActivity() {
          * Key for passing QR code data in the result intent.
          */
         const val QR_DATA = "qr_data"
+        const val FROM_GALLERY = "from_gallery"
+        const val AUTO_FOCUS = "auto_focus"
     }
 
 }

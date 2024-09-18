@@ -16,7 +16,7 @@
             app:flashButtonVisible="false" />
 
         <ImageView
-            android:id="@+id/img_select_image"
+            android:id="@+id/img_gallery"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_gravity="end"

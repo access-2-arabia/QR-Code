@@ -30,8 +30,8 @@ class ScanQrContract : ActivityResultContract<ScanQrOption, String?>() {
      */
     override fun createIntent(context: Context, input: ScanQrOption): Intent {
         return Intent(context, ScanQRActivity::class.java).apply {
-            putExtra("from_gallery", input.fromGallery)
-            putExtra("auto_focus", input.autoFocusEnabled)
+            putExtra(ScanQRActivity.FROM_GALLERY, input.fromGallery)
+            putExtra(ScanQRActivity.AUTO_FOCUS, input.autoFocusEnabled)
         }
     }
 
