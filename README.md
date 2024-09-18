@@ -46,7 +46,7 @@ Add the necessary dependencies to your `build.gradle` file (app-level). Ensure t
 
 ```kotlin
 dependencies {
-    implementation ("com.a2a.qrCode:1.0.0")
+    implementation ("com.github.access-2-arabia:QR-Code:1.0.0-alpha")
 }
 ```
 
