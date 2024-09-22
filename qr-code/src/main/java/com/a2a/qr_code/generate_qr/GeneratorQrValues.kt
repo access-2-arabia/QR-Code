@@ -1,5 +1,6 @@
 package com.a2a.qr_code.generate_qr
 
+import com.a2a.qr_code.core.Duration
 import com.a2a.qr_code.core.formatQrUri
 import com.a2a.qr_code.core.qr_constraints.QrConstraints
 import com.a2a.qr_code.exceptions.InvalidQrFiled
@@ -18,7 +19,7 @@ import com.a2a.qr_code.exceptions.InvalidQrFiled
 class GeneratorQrValues private constructor(
     private val identifier: String,
     private val amount: String,
-    private val expiry: String
+    private val expiry: Duration
 ) {
 
     /**
@@ -31,7 +32,7 @@ class GeneratorQrValues private constructor(
 
         private var identifier: String = ""
         private var amount: String = ""
-        private var expiry: String = ""
+        private var expiry: Duration = Duration(days = 2)
         private var qrConstraints: QrConstraints = QrConstraints.Builder().build()
 
         /**
@@ -60,7 +61,7 @@ class GeneratorQrValues private constructor(
          * @param expiry The expiry date in a specified format.
          * @return The Builder instance for method chaining.
          */
-        fun setExpiry(expiry: String) = apply {
+        fun setExpiry(expiry: Duration) = apply {
             this.expiry = expiry
         }
 
@@ -86,7 +87,7 @@ class GeneratorQrValues private constructor(
 
             val isValidIdentifier = qrConstraints.identifierConstraint.validate(identifier)
             val isValidAmount = qrConstraints.amountConstraint.validate(amount)
-            val isValidExpiry = qrConstraints.expiryConstraint.validate(expiry)
+            val isValidExpiry = qrConstraints.expiryConstraint.validate(expiry.formatExpiryDate())
 
             if (isValidIdentifier.not()) {
                 throw InvalidQrFiled("identifier")

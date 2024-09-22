@@ -2,6 +2,9 @@ package com.a2a.qr_code.core.qr_constraints.defaults
 
 import com.a2a.qr_code.core.qr_constraints.QrFiledConstraint
 import kotlinx.parcelize.Parcelize
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 /**
  * A default implementation of [QrFiledConstraint] for validating expiry fields in QR codes.
@@ -20,6 +23,15 @@ class DefaultExpiryConstraint : QrFiledConstraint<String> {
      * @return `true` if the value is not blank; `false` otherwise.
      */
     override fun validate(value: String?): Boolean {
-        return value?.isNotBlank() == true
+        if (value.isNullOrBlank()) return false
+
+        // Define the date format expected for the expiry date
+        val formatter = DateTimeFormatter.ofPattern("M/d/yyyy")
+        return try {
+            val expiryDate = LocalDate.parse(value, formatter)
+            !expiryDate.isBefore(LocalDate.now())
+        } catch (e: DateTimeParseException) {
+            false
+        }
     }
 }

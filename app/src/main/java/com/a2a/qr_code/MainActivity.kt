@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.a2a.qr_code.core.Duration
 import com.a2a.qr_code.core.qr_constraints.QrConstraints
 import com.a2a.qr_code.core.qr_constraints.defaults.DefaultAmountFieldConstraint
 import com.a2a.qr_code.core.qr_constraints.defaults.DefaultExpiryConstraint
@@ -42,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         val qrValues = GeneratorQrValues.Builder()
             .setIdentifier("123") // Set the identifier for the QR code
             .setAmount("1.0") // Set the amount associated with the QR code
-            .setExpiry("2/10/2024") // Set the expiry date for the QR code
+            .setExpiry(Duration(days = 2)) // Set the expiry date for the QR code
             .setQrConstraints(qrConstraints) // Attach the constraints to the QR values
             .build()
 

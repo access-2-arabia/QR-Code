@@ -2,8 +2,7 @@
 
 ## Overview
 
-The QR Code Library provides an easy way to generate and decode QR codes in your Android applications. It includes functionality for creating QR codes with customizable options, handling QR code scanning, and more.
-
+The QR Code Library offers a user-friendly solution for generating and decoding QR codes in Android applications, making it particularly valuable for developers. This library allows you to create customizable QR codes tailored to specific needs, facilitating easy sharing of information. Additionally, it supports QR code scanning, enabling users to quickly access content or services. With its straightforward integration and versatile features, the QR Code Library can enhance various applications, from business transactions to educational tools, promoting digital engagement in Syria.
 ## Features
 
 - Generate QR codes with customizable size, padding, and logo.
@@ -65,7 +64,7 @@ val qrConstraints = QrConstraints.Builder()
 val qrValues = GeneratorQrValues.Builder()
     .setIdentifier("123")
     .setAmount("1.0")
-    .setExpiry("2/10/2024")
+    .setExpiry(Duration(days = 2))
     .setQrConstraints(qrConstraints)
     .build()
 
@@ -153,7 +152,7 @@ The `ScanQRActivity` is part of the library and is responsible for scanning and 
 
 The QR code data must include the following fields:
 
-- `identifier`: The unique identifier for the QR code.
+- `identifier`: This represents a unique identifier for the QR code, which could be a card number, account number, or any other specific reference. For example, in a payment application, the identifier might be the user’s account number
 - `amount`: The amount associated with the QR code.
 - `expiry`: The expiry date for the QR code.
 
