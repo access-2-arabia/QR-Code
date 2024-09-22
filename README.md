@@ -7,7 +7,7 @@ The QR Code Library provides an easy way to generate and decode QR codes in your
 ## Features
 
 - Generate QR codes with customizable size, padding, and logo.
-- Scan QR codes using device cameras.
+- Scan QR codes using device cameras via `ScanQRActivity`.
 - Select images from the gallery and decode QR codes from them.
 
 ## Table of Contents
@@ -26,23 +26,21 @@ To use the QR Code Library in your Android project, follow these steps:
 
 ### Add Repositories
 
-Ensure you have the required repositories included in your `build.gradle` file (project-level). This includes the Google Maven repository and JitPack for additional library support.
-
-In your root `build.gradle` file:
+Ensure you have the required repositories included in your `build.gradle` file (project-level):
 
 ```groovy
 allprojects {
     repositories {
-        google()      // Essential for Jetpack libraries and other Android dependencies
-        mavenCentral() // Central repository for other dependencies
-        maven { url "https://jitpack.io" } // JitPack repository for hosted libraries
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
     }
 }
 ```
 
 ### Library Dependencies
 
-Add the necessary dependencies to your `build.gradle` file (app-level). Ensure these are included as needed for your project:
+Add the necessary dependencies to your `build.gradle` file (app-level):
 
 ```kotlin
 dependencies {
@@ -54,56 +52,113 @@ dependencies {
 
 ### QR Code Generation
 
-To generate a QR code, use the `QRGenerator` class and its `Builder`. Here is an example:
+To generate a QR code, use the `QrGenerator` class:
 
 ```kotlin
-val qrCodeBitmap = QRGenerator.Builder("Your QR Code Content")
+val qrConstraints = QrConstraints.Builder()
+    .setIdentifierConstraint(DefaultIdentifierConstraint())
+    .setAmountConstraint(DefaultAmountFieldConstraint())
+    .setExpiryConstraint(DefaultExpiryConstraint())
+    .build()
+
+val qrValues = GeneratorQrValues.Builder()
+    .setIdentifier("123")
+    .setAmount("1.0")
+    .setExpiry("2/10/2024")
+    .setQrConstraints(qrConstraints)
+    .build()
+
+val logoBitmap = BitmapFactory.decodeResource(resources, R.drawable.logo)
+
+val qrCodeBitmap = QrGenerator.Builder(qrValues)
+    .setLogo(logoBitmap)
+    .setPaddingScale(0.0f)
     .setQrCodeSize(500)
-    .setPaddingScale(0.2f)
-    .setLogo(yourLogoBitmap) // Optional
     .build()
 ```
 
 ### QR Code Scanning
 
-To scan QR codes, create an instance of `ScanQRActivity` and use the `ScanQrContract` to handle the result:
+To scan QR codes, use `ScanQRActivity` directly in your application:
 
-1. **Create the Contract**
+```kotlin
+val qrConstraints = QrConstraints.Builder()
+    .setIdentifierConstraint(DefaultIdentifierConstraint())
+    .setAmountConstraint(DefaultAmountFieldConstraint())
+    .setExpiryConstraint(DefaultExpiryConstraint())
+    .build()
 
-   ```kotlin
-   val scanQrOption = ScanQrOption.Builder()
-       .setAutoFocusEnabled(true)
-       .setReadFromGallery(false)
-       .build()
-   ```
+val intent = Intent(this, ScanQRActivity::class.java).apply {
+    putExtra(ScanQRActivity.FROM_GALLERY, true)
+    putExtra(ScanQRActivity.CONSTRAINTS, qrConstraints)
+}
+startActivityForResult(intent, REQUEST_CODE_SCAN_QR)
+```
 
-2. **Launch the Activity**
+### `ScanQRActivity`
 
-   ```kotlin
-   val scanQrLauncher = registerForActivityResult(ScanQrContract()) { qrData ->
-       // Handle the QR code result
-   }
-   scanQrLauncher.launch(scanQrOption)
-   ```
+The `ScanQRActivity` is part of the library and is responsible for scanning and decoding QR codes using the device's camera and allowing users to select images from their gallery.
+
+#### Features
+
+- **Camera Access**: Requests permission to access the camera for scanning QR codes.
+- **Gallery Access**: Lets users select an image from the gallery to decode a QR code.
+- **QR Code Validation**: Validates the scanned or selected QR code against predefined constraints.
+- **User Notifications**: Displays error dialogs for invalid QR codes or permission-related issues.
+
+#### Permissions
+
+`ScanQRActivity` requires the following permissions:
+
+- `CAMERA`: For scanning QR codes using the camera.
+- `READ_EXTERNAL_STORAGE` or `READ_MEDIA_IMAGES`: For accessing images from the gallery.
+
+#### Intent Extras
+
+- `FROM_GALLERY`: Indicates whether to allow image selection from the gallery.
+- `AUTO_FOCUS`: Determines if the auto-focus button is visible in the scanner view.
+- `CONSTRAINTS`: A Parcelable object defining validation rules for the QR code fields.
+
+#### QR Code Data
+
+The QR code data must include the following fields:
+
+- `identifier`: The unique identifier for the QR code.
+- `amount`: The amount associated with the QR code.
+- `expiry`: The expiry date for the QR code.
+
+If any fields do not meet validation criteria, an `InvalidQrFiled` exception will be thrown.
+
+#### Error Handling
+
+If an invalid QR code is detected or issues arise during scanning, an error dialog will prompt the user to use a valid QR code.
 
 ## API Reference
 
-### `QRGenerator`
+### `QrGenerator`
 
 - **Builder Class**
-
     - `setQrCodeSize(size: Int)`: Set the size of the QR code.
     - `setPaddingScale(scale: Float)`: Set the padding scale for the logo.
     - `setLogo(logoBitmap: Bitmap)`: Set the logo to be embedded in the QR code.
+    - `setQrConstraints(qrConstraints: QrConstraints)`: Set constraints for the QR code.
     - `build()`: Generate the QR code bitmap with the specified options.
 
 ### `ScanQrOption`
 
 - **Builder Class**
-
-    - `setAutoFocusEnabled(autoFocusEnabled: Boolean)`: Set whether auto focus is enabled.
+    - `setAutoFocusEnabled(autoFocusEnabled: Boolean)`: Set whether auto-focus is enabled.
     - `setReadFromGallery(fromGallery: Boolean)`: Set whether the QR code should be read from the gallery.
+    - `setQrConstraints(qrConstraints: QrConstraints)`: Set the constraints for scanning the QR code.
     - `build()`: Build the `ScanQrOption` instance.
+
+### `ScanQRActivity`
+
+- **Constants**
+    - `QR_DATA`: Key for the scanned QR code data.
+    - `FROM_GALLERY`: Key to indicate if the activity allows image selection.
+    - `AUTO_FOCUS`: Key for enabling auto-focus in the scanner view.
+    - `CONSTRAINTS`: Key for validation constraints.
 
 ### `ScanQrContract`
 
@@ -111,4 +166,3 @@ To scan QR codes, create an instance of `ScanQRActivity` and use the `ScanQrCont
 - **parseResult(resultCode: Int, intent: Intent?): String?**
 
 ---
-

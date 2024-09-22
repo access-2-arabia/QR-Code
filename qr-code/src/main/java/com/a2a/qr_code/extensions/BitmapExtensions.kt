@@ -8,14 +8,14 @@ import com.google.zxing.ReaderException
 import com.google.zxing.common.HybridBinarizer
 
 /**
- * Reads and decodes a QR code from the given [Bitmap].
+ * Extension function to decode a QR code from a Bitmap image.
  *
- * This function converts the `Bitmap` to a grayscale image, then uses the ZXing library to decode
- * the QR code from the grayscale image. It is suitable for decoding QR codes from images that
- * are in the form of `Bitmap` objects.
+ * This function processes the Bitmap to extract the QR code information as a String.
+ * It converts the Bitmap to a luminance source and attempts to decode it using ZXing's
+ * MultiFormatReader. If decoding is successful, it returns the QR code text; otherwise,
+ * it returns null.
  *
- * @return The decoded QR code text if successful; `null` if decoding fails or the input
- *         does not contain a valid QR code.
+ * @return The decoded QR code text as a String, or null if the decoding fails.
  */
 fun Bitmap.readQrCode(): String? {
     val bitmap = this.copy(Bitmap.Config.ARGB_8888, true)

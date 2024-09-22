@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
     id("maven-publish")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -48,7 +49,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation ("com.github.yuriy-budiyev:code-scanner:2.3.2")
+    implementation (libs.code.scanner)
+    implementation(libs.kotlinx.serialization.json)
 }
 
 

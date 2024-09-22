@@ -1,4 +1,4 @@
-package com.a2a.qr_code.utils
+package com.a2a.qr_code.generate_qr
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -8,6 +8,7 @@ import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
+import android.util.Log
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
@@ -16,16 +17,20 @@ import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 
 /**
- * A class to generate QR codes with optional logo embedding and customization.
+ * A class for generating QR codes with customizable options such as size, logo, and padding.
+ *
+ * This class employs a Builder pattern to facilitate the creation of QR codes with specific
+ * configurations. It allows for the integration of a logo and provides methods for customizing
+ * the QR code's size and appearance.
  */
-class QRGenerator private constructor() {
+class QrGenerator private constructor() {
 
     /**
-     * Builder class for constructing QR codes with customizable options.
+     * Builder class for constructing QR codes with specified values and customization options.
      *
-     * @property content The text content to be encoded in the QR code.
+     * @property values An instance of [GeneratorQrValues] that holds the data to be encoded.
      */
-    class Builder(private val content: String) {
+    class Builder(private val values: GeneratorQrValues) {
         private var qrCodeSize: Int = 500
         private var centerSizeScale: Float = 0.2f
         private var paddingScale: Float = 0.2f
@@ -34,7 +39,7 @@ class QRGenerator private constructor() {
         /**
          * Sets the size of the QR code.
          *
-         * @param size The size in pixels for the QR code.
+         * @param size The desired size in pixels.
          * @return The Builder instance for method chaining.
          */
         fun setQrCodeSize(size: Int) = apply {
@@ -44,7 +49,7 @@ class QRGenerator private constructor() {
         /**
          * Sets the padding scale for the logo.
          *
-         * @param scale The scale factor for the logo padding (between 0 and 1).
+         * @param scale The scale for padding around the logo.
          * @return The Builder instance for method chaining.
          */
         fun setPaddingScale(scale: Float) = apply {
@@ -52,9 +57,9 @@ class QRGenerator private constructor() {
         }
 
         /**
-         * Sets the logo to be embedded in the center of the QR code.
+         * Sets the logo bitmap to be included in the QR code.
          *
-         * @param logoBitmap The Bitmap image of the logo.
+         * @param logoBitmap The bitmap of the logo.
          * @return The Builder instance for method chaining.
          */
         fun setLogo(logoBitmap: Bitmap) = apply {
@@ -62,9 +67,9 @@ class QRGenerator private constructor() {
         }
 
         /**
-         * Builds the QR code bitmap with the specified configurations.
+         * Builds the QR code bitmap based on the specified configurations.
          *
-         * @return The generated QR code as a Bitmap, or null if an error occurs.
+         * @return A bitmap representing the generated QR code, or null if generation fails.
          */
         fun build(): Bitmap? {
             val bitMatrix = generateBitMatrix() ?: return null
@@ -75,16 +80,16 @@ class QRGenerator private constructor() {
         }
 
         /**
-         * Generates a BitMatrix for the QR code based on the content and size.
+         * Generates a BitMatrix for the QR code using the specified values.
          *
-         * @return The BitMatrix representing the QR code, or null if an error occurs.
+         * @return A BitMatrix representing the QR code, or null if an error occurs.
          */
         private fun generateBitMatrix(): BitMatrix? {
             val hints = hashMapOf<EncodeHintType, Any>()
             hints[EncodeHintType.ERROR_CORRECTION] = ErrorCorrectionLevel.H
             return try {
                 MultiFormatWriter().encode(
-                    content,
+                    values.toString(),
                     BarcodeFormat.QR_CODE,
                     qrCodeSize,
                     qrCodeSize,
@@ -92,15 +97,15 @@ class QRGenerator private constructor() {
                 )
             } catch (e: WriterException) {
                 e.printStackTrace()
+                Log.e("TAG" , e.stackTraceToString())
                 null
             }
         }
-
         /**
-         * Creates a Bitmap representation of the QR code from the BitMatrix.
+         * Creates a bitmap representation of the QR code from the BitMatrix.
          *
-         * @param bitMatrix The BitMatrix representing the QR code.
-         * @return The Bitmap of the QR code.
+         * @param bitMatrix The BitMatrix to convert to a bitmap.
+         * @return A bitmap representing the QR code.
          */
         private fun createQrCodeBitmap(bitMatrix: BitMatrix): Bitmap {
             val bitmap = Bitmap.createBitmap(qrCodeSize, qrCodeSize, Bitmap.Config.ARGB_8888)
@@ -116,9 +121,9 @@ class QRGenerator private constructor() {
         }
 
         /**
-         * Creates a mask Bitmap for the center of the QR code.
+         * Creates a mask bitmap that will be used to cut out a center portion of the QR code.
          *
-         * @return The mask Bitmap with a rounded rectangle in the center.
+         * @return A bitmap representing the mask.
          */
         private fun createMaskBitmap(): Bitmap {
             val centerSize = (qrCodeSize * centerSizeScale).toInt()
@@ -145,12 +150,13 @@ class QRGenerator private constructor() {
             return maskBitmap
         }
 
+
         /**
-         * Combines the QR code bitmap and mask bitmap.
+         * Combines the QR code bitmap with the mask bitmap to create the final QR code.
          *
-         * @param qrCodeBitmap The Bitmap of the QR code.
-         * @param maskBitmap The Bitmap of the mask.
-         * @return The Bitmap combining both the QR code and mask.
+         * @param qrCodeBitmap The bitmap of the QR code.
+         * @param maskBitmap The bitmap of the mask.
+         * @return A bitmap representing the combined result.
          */
         private fun combineQrCodeAndMask(qrCodeBitmap: Bitmap, maskBitmap: Bitmap): Bitmap {
             val resultBitmap = Bitmap.createBitmap(qrCodeSize, qrCodeSize, Bitmap.Config.ARGB_8888)
@@ -161,10 +167,10 @@ class QRGenerator private constructor() {
         }
 
         /**
-         * Adds the logo to the center of the QR code.
+         * Adds the specified logo to the center of the QR code.
          *
-         * @param resultBitmap The Bitmap of the QR code with mask applied.
-         * @return The Bitmap with the logo added, or the original bitmap if no logo is set.
+         * @param resultBitmap The bitmap of the QR code with the mask applied.
+         * @return A bitmap with the logo added, or the original bitmap if no logo is set.
          */
         private fun addLogo(resultBitmap: Bitmap): Bitmap {
             logo?.let {
