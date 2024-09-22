@@ -18,6 +18,7 @@ The QR Code Library provides an easy way to generate and decode QR codes in your
 2. [Usage](#usage)
     - [QR Code Generation](#qr-code-generation)
     - [QR Code Scanning](#qr-code-scanning)
+    - [Adding Custom Constraints](#adding-custom-constraints)
 3. [API Reference](#api-reference)
 
 ## Setup
@@ -95,6 +96,35 @@ val intent = Intent(this, ScanQRActivity::class.java).apply {
 startActivityForResult(intent, REQUEST_CODE_SCAN_QR)
 ```
 
+### Adding Custom Constraints
+
+You can create your own constraints by implementing the `QrConstraint` interface. Here’s how to define a custom constraint:
+
+1. **Create Your Custom Constraint Class**:
+
+```kotlin
+class CustomIdentifierConstraint : QrFiledConstraint<String>  {
+    override fun isValid(value: String): Boolean {
+        // Implement your custom validation logic here
+        return value.length == 6 // Example: must be exactly 6 characters
+    }
+}
+```
+
+2. **Add Your Custom Constraint**:
+
+In the `QrConstraints.Builder`, replace the default constraints with your custom ones:
+
+```kotlin
+val qrConstraints = QrConstraints.Builder()
+    .setIdentifierConstraint(CustomIdentifierConstraint())
+    .setAmountConstraint(DefaultAmountFieldConstraint())
+    .setExpiryConstraint(DefaultExpiryConstraint())
+    .build()
+```
+
+This allows you to enforce your own rules for QR code validation.
+
 ### `ScanQRActivity`
 
 The `ScanQRActivity` is part of the library and is responsible for scanning and decoding QR codes using the device's camera and allowing users to select images from their gallery.
@@ -127,7 +157,7 @@ The QR code data must include the following fields:
 - `amount`: The amount associated with the QR code.
 - `expiry`: The expiry date for the QR code.
 
-If any fields do not meet validation criteria, an `InvalidQrFiled` exception will be thrown.
+If any fields do not meet validation criteria, an `InvalidQrField` exception will be thrown.
 
 #### Error Handling
 
@@ -164,5 +194,3 @@ If an invalid QR code is detected or issues arise during scanning, an error dial
 
 - **createIntent(context: Context, input: ScanQrOption): Intent**
 - **parseResult(resultCode: Int, intent: Intent?): String?**
-
----
