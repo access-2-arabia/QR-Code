@@ -2,7 +2,15 @@
 
 ## Overview
 
-The QR Code Library offers a user-friendly solution for generating and decoding QR codes in Android applications, making it particularly valuable for developers. This library allows you to create customizable QR codes tailored to specific needs, facilitating easy sharing of information. Additionally, it supports QR code scanning, enabling users to quickly access content or services. With its straightforward integration and versatile features, the QR Code Library can enhance various applications, from business transactions to educational tools, promoting digital engagement in Syria.
+The library includes built-in mechanisms to both generate and validate QR codes according to the Syrian standard. When generating a QR code, it ensures that essential components such as the identifier (account number or card number), the amount, and the expiry date are included in a standardized format. On the validation side, the library checks whether any scanned QR code adheres to the Syrian standard or belongs to another system. This makes the library a secure and reliable tool for generating and validating QR codes in Syria, ensuring consistent use across various applications.
+
+## Example QR Code
+
+Below is an example of a QR code generated using the library. You can scan it to test the functionality:
+
+![3204db76f514b537305a8512f13bf1da](https://github.com/user-attachments/assets/bcca1592-12b1-41bf-983d-967f8615b6b8)
+
+
 ## Features
 
 - Generate QR codes with customizable size, padding, and logo.
