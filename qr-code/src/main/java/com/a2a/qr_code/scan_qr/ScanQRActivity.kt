@@ -9,11 +9,17 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import com.a2a.qrCode.R
 import com.a2a.qrCode.databinding.ActivityScanQrBinding
+import com.a2a.qr_code.core.AMOUNT
+import com.a2a.qr_code.core.EXPIRY
+import com.a2a.qr_code.core.IDENTIFIER
 import com.a2a.qr_code.core.qr_constraints.QrConstraints
 import com.a2a.qr_code.exceptions.InvalidQrFiled
 import com.a2a.qr_code.extensions.decodeQRCodeFromUri
@@ -100,12 +106,26 @@ class ScanQRActivity : AppCompatActivity() {
         }
 
 
+    private val pickMedia =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                setResult(baseContext.decodeQRCodeFromUri(uri).orEmpty())
+            }
+        }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityScanQrBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupOptions()
-        binding.imgGallery.setOnClickListener { checkReadExternalPermission() }
+        binding.imgGallery.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            } else {
+                checkReadExternalPermission()
+            }
+        }
     }
 
     private fun setupOptions() {
@@ -132,8 +152,12 @@ class ScanQRActivity : AppCompatActivity() {
             setResult(RESULT_OK, resultIntent)
             finish()
         } catch (e: Exception) {
-            Log.e("TAG", e.stackTraceToString())
-            runOnUiThread { showDialog() }
+            Log.e(ScanQRActivity::class.java.simpleName, e.stackTraceToString())
+            if (e is InvalidQrFiled && e.fieldName == EXPIRY) {
+                showDialog(title = R.string.qr_expired, message = R.string.please_use_valid_qr)
+            } else {
+                showDialog(title = R.string.invalid_qr, message = R.string.please_use_valid_qr)
+            }
         }
     }
 
@@ -168,11 +192,11 @@ class ScanQRActivity : AppCompatActivity() {
         val isValidExpiry = qrConstraints.expiryConstraint.validate(expiry)
 
         if (isValidIdentifier.not()) {
-            throw InvalidQrFiled("identifier")
+            throw InvalidQrFiled(IDENTIFIER)
         } else if (isValidAmount.not()) {
-            throw InvalidQrFiled("amount")
+            throw InvalidQrFiled(AMOUNT)
         } else if (isValidExpiry.not()) {
-            throw InvalidQrFiled("expiry")
+            throw InvalidQrFiled(EXPIRY)
         }
     }
 
@@ -196,14 +220,15 @@ class ScanQRActivity : AppCompatActivity() {
         }
     }
 
-    private fun showDialog() {
-        val builder = AlertDialog.Builder(this)
-        val dialog = builder.setTitle("Invalid QR")
-            .setMessage("Please use valid qr")
-            .setPositiveButton("OK") { _, _ -> codeScanner.startPreview() }
-            .create()
-
-        dialog.show()
+    private fun showDialog(@StringRes title: Int, @StringRes message: Int) {
+        runOnUiThread {
+            val builder = AlertDialog.Builder(this)
+            val dialog = builder.setTitle(getString(title))
+                .setMessage(message)
+                .setPositiveButton(getString(R.string.ok)) { _, _ -> codeScanner.startPreview() }
+                .create()
+            dialog.show()
+        }
     }
 
     override fun onPause() {

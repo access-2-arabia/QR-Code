@@ -8,7 +8,7 @@ package com.a2a.qr_code.exceptions
  *
  * @property fieldName The name of the invalid field, which will be included in the error message.
  */
-class InvalidQrFiled(private val fieldName: String?) : Exception() {
+class InvalidQrFiled(val fieldName: String?) : Exception() {
 
     override val message: String
         get() = "The $fieldName field is invalid"

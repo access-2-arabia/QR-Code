@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="invalid_qr">Invalid QR</string>
+    <string name="please_use_valid_qr">Please use valid qr</string>
+    <string name="ok">OK</string>
+    <string name="qr_expired">The QR code has expired</string>
+</resources>

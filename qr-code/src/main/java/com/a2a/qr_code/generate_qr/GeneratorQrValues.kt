@@ -1,6 +1,9 @@
 package com.a2a.qr_code.generate_qr
 
+import com.a2a.qr_code.core.AMOUNT
 import com.a2a.qr_code.core.Duration
+import com.a2a.qr_code.core.EXPIRY
+import com.a2a.qr_code.core.IDENTIFIER
 import com.a2a.qr_code.core.formatQrUri
 import com.a2a.qr_code.core.qr_constraints.QrConstraints
 import com.a2a.qr_code.exceptions.InvalidQrFiled
@@ -90,11 +93,11 @@ class GeneratorQrValues private constructor(
             val isValidExpiry = qrConstraints.expiryConstraint.validate(expiry.formatExpiryDate())
 
             if (isValidIdentifier.not()) {
-                throw InvalidQrFiled("identifier")
+                throw InvalidQrFiled(IDENTIFIER)
             } else if (isValidAmount.not()) {
-                throw InvalidQrFiled("amount")
+                throw InvalidQrFiled(AMOUNT)
             } else if (isValidExpiry.not()) {
-                throw InvalidQrFiled("expiry")
+                throw InvalidQrFiled(EXPIRY)
             }
 
             return GeneratorQrValues(identifier, amount, expiry)

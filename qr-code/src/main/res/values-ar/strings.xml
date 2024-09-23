@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="invalid_qr">رمز QR غير صالح</string>
+    <string name="please_use_valid_qr">يرجى استخدام رمز QR صالح</string>
+    <string name="ok">موافق</string>
+    <string name="qr_expired">رمز QR انتهت صلاحيته</string>
+
+</resources>
